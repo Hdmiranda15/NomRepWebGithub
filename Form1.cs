@@ -83,13 +83,13 @@ namespace U4_memoria
 
         private void Limpiar_Click(object sender, EventArgs e)
         {
-            dgvProductos.Rows.Clear(); // Elimina todas las filas del DataGridView.
+           // dgvProductos.Rows.Clear(); // Elimina todas las filas del DataGridView.
 
-            txtPU.Text = ""; // Establece el contenido del TextBox en blanco.
-            txtCantidad.Text = ""; // Establece el contenido del TextBox en blanco.
+            //txtPU.Text = ""; // Establece el contenido del TextBox en blanco.
+           // txtCantidad.Text = ""; // Establece el contenido del TextBox en blanco.
             
-           lblTotal.Text = ""; // Establece el contenido de la etiqueta en blanco.
-           lblIVA.Text = ""; // Establece el contenido de la etiqueta en blanco.
+          // lblTotal.Text = ""; // Establece el contenido de la etiqueta en blanco.
+          // lblIVA.Text = ""; // Establece el contenido de la etiqueta en blanco.
 
             ////////////////////////////////////////// MEMORIA estatica //////////////////////////////////////////
             ///////////////////////////////////////////// MEMORIA estatica //////////////////////////////////////////
