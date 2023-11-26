@@ -77,7 +77,7 @@ namespace U4_memoria
 
         private void salir_Click(object sender, EventArgs e)
         {
-            //Application.Exit();// cerrar la aplicacion
+            Application.Exit();// cerrar la aplicacion
             //Class.metodo
         }
 
