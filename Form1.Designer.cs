@@ -222,7 +222,7 @@
             // 
             // Limpiar
             // 
-            this.Limpiar.Location = new System.Drawing.Point(701, 251);
+            this.Limpiar.Location = new System.Drawing.Point(701, 236);
             this.Limpiar.Name = "Limpiar";
             this.Limpiar.Size = new System.Drawing.Size(88, 25);
             this.Limpiar.TabIndex = 3;
