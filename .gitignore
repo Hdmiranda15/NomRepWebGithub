@@ -1,0 +1,19 @@
+staticfiles/
+__pycache__/
+*.pyc
+db.sqlite3
+*.log
+logs/
+*.pot
+*.mo
+local_settings.py
+.env
+media/
+# Django
+*.sqlite3
+/staticfiles/
+/mediafiles/
+# Gunicorn
+gunicorn.log.*
+access.log
+error.log
