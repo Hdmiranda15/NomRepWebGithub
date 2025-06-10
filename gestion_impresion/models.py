@@ -22,7 +22,7 @@ class Items(models.Model):
     formato_presentacion = models.TextField(blank=True, null=True)
     unidad_medida_inventario = models.TextField(blank=True, null=True)
     stock_actual = models.IntegerField(blank=True, null=True)
-    stock_minimo_pedido = models.TextField(blank=True, null=True) # Assuming text, adjust if numeric
+    stock_minimo_pedido = models.IntegerField(blank=True, null=True) # Assuming text, adjust if numeric
 
     class Meta:
         managed = False
@@ -104,6 +104,7 @@ class OrdenesDeImpresion(models.Model):
     fecha_entrega_estimada = models.DateField(blank=True, null=True)
     tipo_impresion = models.TextField()
     cantidad_copias = models.IntegerField()
+    numero_paginas_documento_ingresado = models.IntegerField(blank=True, null=True) # New field
     material_solicitado = models.TextField(blank=True, null=True)
     archivo_adjunto_ruta = models.TextField(blank=True, null=True)
     observaciones_cliente = models.TextField(blank=True, null=True)

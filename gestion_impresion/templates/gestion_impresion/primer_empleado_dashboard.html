@@ -160,8 +160,6 @@
                 {% endif %}
             </div>
 
-            {# Remove the old non-Django form fields and submit button if they existed #}
-            {# Add the new submit button with name="submit_crear_orden" #}
             <button type="submit" name="submit_crear_orden" class="px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 Generar Orden
             </button>
@@ -174,14 +172,13 @@
         <form id="formRegistrarConsumo" method="post" class="grid grid-cols-1 gap-6">
             {% csrf_token %}
 
-            {# Render fields individually to maintain styling from InsumoConsumptionForm widgets #}
             <div>
                 <label for="{{ consumption_form.orden_consumo.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ consumption_form.orden_consumo.label }}</label>
                 {{ consumption_form.orden_consumo }}
                 {% if consumption_form.orden_consumo.errors %}
                     <span class="text-red-500 text-sm mt-1">{{ consumption_form.orden_consumo.errors|first }}</span>
                 {% else %}
-                    <span id="error-orden-consumo" class="text-red-500 text-sm mt-1"></span> {# Placeholder for JS validation if any #}
+                    <span id="error-orden-consumo" class="text-red-500 text-sm mt-1"></span>
                 {% endif %}
             </div>
 
@@ -247,8 +244,6 @@
         <h2 class="text-2xl font-semibold mb-4 text-gray-700">Consultar Estado de Orden</h2>
 
         <form method="get" action="{% url 'gestion_impresion:primer_empleado_dashboard' %}" id="formVerEstado" class="grid grid-cols-1 gap-6">
-            {# Hidden input to keep the current tab active after form submission. More robust solutions exist. #}
-            {# Or, better, handle active tab with JS based on URL or a parameter if needed #}
             <div>
                 <label for="orden-estado-select" class="block text-sm font-medium text-gray-700">Seleccionar Orden</label>
                 <select id="orden-estado-select" name="selected_orden_id_rf5" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500" onchange="document.getElementById('formVerEstado').submit();">
@@ -259,7 +254,6 @@
                         </option>
                     {% endfor %}
                 </select>
-                {# No explicit submit button needed if using onchange submit #}
             </div>
         </form>
 
@@ -282,7 +276,6 @@
                 </p>
                 {% if selected_order_details_rf5.archivo_adjunto_ruta %}
                 <p class="text-gray-700"><strong>Archivo Adjunto:</strong>
-                    {# Assuming MEDIA_URL is configured #}
                     <a href="{{ MEDIA_URL }}{{ selected_order_details_rf5.archivo_adjunto_ruta }}" target="_blank" class="text-blue-500 hover:underline">
                         {{ selected_order_details_rf5.archivo_adjunto_ruta|cut:"order_files/" }}
                     </a>
@@ -292,7 +285,6 @@
             </div>
         {% else %}
             <div id="estado-detalle" class="mt-4 p-4 border border-gray-200 rounded-md hidden">
-                 {# This will remain hidden if no order is selected, or shown by JS if we add tab persistence #}
                 <p class="text-gray-500">Seleccione una orden para ver sus detalles.</p>
             </div>
         {% endif %}
@@ -301,45 +293,95 @@
     <!-- Sección: Actualizar Orden -->
     <div id="actualizar-orden" class="tab-content bg-white p-6 rounded-lg shadow-md hidden">
         <h2 class="text-2xl font-semibold mb-4 text-gray-700">Actualizar Orden de Impresión</h2>
-        <form id="formActualizarOrden" class="grid grid-cols-1 gap-6" onsubmit="return validarActualizarOrden()">
+
+        <form method="get" action="{% url 'gestion_impresion:primer_empleado_dashboard' %}" id="formSelectOrdenParaActualizar" class="grid grid-cols-1 gap-6 mb-6">
             <div>
-                <label for="orden-actualizar" class="block text-sm font-medium text-gray-700">Seleccionar Orden</label>
-                <select id="orden-actualizar" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                <label for="orden-actualizar-select" class="block text-sm font-medium text-gray-700">Seleccionar Orden para Actualizar</label>
+                <select id="orden-actualizar-select" name="update_orden_id" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500" onchange="this.form.submit();">
                     <option value="">Seleccionar Orden...</option>
-                    <option value="orden001">Orden #001 - Cliente A</option>
-                    <option value="orden002">Orden #002 - Cliente B</option>
+                    {% for orden in all_orders_rf6 %}
+                        <option value="{{ orden.id_orden }}" {% if update_orden_id_val == orden.id_orden|stringformat:"s" %}selected{% endif %}>
+                            Orden #{{ orden.id_orden }} - {{ orden.id_cliente.nombre_cliente }} ({{ orden.fecha_creacion_orden|date:"d/m/Y" }})
+                        </option>
+                    {% endfor %}
                 </select>
-                <span id="error-orden-actualizar" class="text-red-500 text-sm mt-1"></span>
             </div>
-            <div>
-                <label for="actualizar-tipo-papel" class="block text-sm font-medium text-gray-700">Tipo de Papel</label>
-                <select id="actualizar-tipo-papel" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                    <option value="">Seleccionar...</option>
-                    <option value="a4">A4</option>
-                    <option value="carta">Carta</option>
-                    <option value="fotográfico">Fotográfico</option>
-                </select>
-                <span id="error-actualizar-tipo-papel" class="text-red-500 text-sm mt-1"></span>
-            </div>
-            <div>
-                <label for="actualizar-cantidad" class="block text-sm font-medium text-gray-700">Cantidad de Copias</label>
-                <input type="number" id="actualizar-cantidad" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500" min="1">
-                <span id="error-actualizar-cantidad" class="text-red-500 text-sm mt-1"></span>
-            </div>
-            <div>
-                <label for="actualizar-archivo" class="block text-sm font-medium text-gray-700">Nuevo Archivo (opcional)</label>
-                <input type="file" id="actualizar-archivo" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                <span id="error-actualizar-archivo" class="text-red-500 text-sm mt-1"></span>
-            </div>
-            <div>
-                <label for="actualizar-fecha" class="block text-sm font-medium text-gray-700">Fecha Estimada de Entrega</label>
-                <input type="date" id="actualizar-fecha" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                <span id="error-actualizar-fecha" class="text-red-500 text-sm mt-1"></span>
-            </div>
-            <button type="submit" class="px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                Actualizar Orden
-            </button>
         </form>
+
+        {% if order_to_update_instance %}
+            <h3 class="text-xl font-semibold mb-3 text-gray-600">Editando Orden #{{ order_to_update_instance.id_orden }}</h3>
+            <form id="formActualizarOrden" method="post" class="grid grid-cols-1 gap-6">
+                {% csrf_token %}
+                <input type="hidden" name="orden_id_to_update" value="{{ order_to_update_instance.id_orden }}">
+
+                <div class="mb-2 p-2 border rounded-md bg-gray-50">
+                    <p class="block text-sm font-medium text-gray-700">Cliente:</p>
+                    <p class="text-md text-gray-800">{{ order_to_update_instance.id_cliente.nombre_cliente }}</p>
+                </div>
+
+                <div>
+                    <label for="{{ order_update_form.tipo_impresion.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ order_update_form.tipo_impresion.label }}</label>
+                    {{ order_update_form.tipo_impresion }}
+                    {% if order_update_form.tipo_impresion.errors %}<span class="text-red-500 text-sm mt-1">{{ order_update_form.tipo_impresion.errors|first }}</span>{% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ order_update_form.cantidad_copias.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ order_update_form.cantidad_copias.label }}</label>
+                    {{ order_update_form.cantidad_copias }}
+                    {% if order_update_form.cantidad_copias.errors %}<span class="text-red-500 text-sm mt-1">{{ order_update_form.cantidad_copias.errors|first }}</span>{% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ order_update_form.fecha_entrega_solicitada.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ order_update_form.fecha_entrega_solicitada.label }}</label>
+                    {{ order_update_form.fecha_entrega_solicitada }}
+                    {% if order_update_form.fecha_entrega_solicitada.errors %}<span class="text-red-500 text-sm mt-1">{{ order_update_form.fecha_entrega_solicitada.errors|first }}</span>{% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ order_update_form.material_solicitado.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ order_update_form.material_solicitado.label }}</label>
+                    {{ order_update_form.material_solicitado }}
+                    {% if order_update_form.material_solicitado.errors %}<span class="text-red-500 text-sm mt-1">{{ order_update_form.material_solicitado.errors|first }}</span>{% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ order_update_form.observaciones_cliente.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ order_update_form.observaciones_cliente.label }}</label>
+                    {{ order_update_form.observaciones_cliente }}
+                    {% if order_update_form.observaciones_cliente.errors %}<span class="text-red-500 text-sm mt-1">{{ order_update_form.observaciones_cliente.errors|first }}</span>{% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ order_update_form.estado_orden.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ order_update_form.estado_orden.label }}</label>
+                    {{ order_update_form.estado_orden }}
+                    {% if order_update_form.estado_orden.errors %}<span class="text-red-500 text-sm mt-1">{{ order_update_form.estado_orden.errors|first }}</span>{% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ order_update_form.id_impresora_asignada.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ order_update_form.id_impresora_asignada.label }}</label>
+                    {{ order_update_form.id_impresora_asignada }}
+                    {% if order_update_form.id_impresora_asignada.errors %}<span class="text-red-500 text-sm mt-1">{{ order_update_form.id_impresora_asignada.errors|first }}</span>{% endif %}
+                </div>
+
+                {% if order_update_form.current_archivo_adjunto.value %}
+                <div class="mb-2 p-2 border rounded-md bg-gray-50">
+                    <label for="{{ order_update_form.current_archivo_adjunto.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ order_update_form.current_archivo_adjunto.label }}</label>
+                    <p class="text-sm text-gray-800">
+                        <a href="{{ MEDIA_URL }}{{ order_update_form.current_archivo_adjunto.value }}" target="_blank" class="text-blue-500 hover:underline">
+                           {{ order_update_form.current_archivo_adjunto.value|cut:"order_files/" }}
+                        </a>
+                    </p>
+                </div>
+                {% endif %}
+
+                <button type="submit" name="submit_actualizar_orden" class="px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Actualizar Orden
+                </button>
+            </form>
+        {% else %}
+            <p class="text-gray-500">Seleccione una orden de la lista de arriba para ver y actualizar sus detalles.</p>
+            {% if update_orden_id_val %}
+                <p class="text-red-500 mt-2">No se encontró una orden con el ID: {{ update_orden_id_val }}. Por favor, seleccione una orden válida.</p>
+            {% endif %}
+        {% endif %}
     </div>
 
     <!-- Sección: Asignar Impresora -->
@@ -445,106 +487,110 @@
 
 </div>
 
-
 <script>
-    function showTab(tabId) {{
+    // Function to show a tab and save its ID
+    function showTabAndPersist(tabId) {
         // Ocultar todos los contenidos de pestaña
         const tabContents = document.querySelectorAll('.tab-content');
-        tabContents.forEach(content => {{
+        tabContents.forEach(content => {
             content.classList.add('hidden');
-        }});
+        });
 
         // Mostrar el contenido de la pestaña seleccionada
-        document.getElementById(tabId).classList.remove('hidden');
+        const activeTabContent = document.getElementById(tabId);
+        if (activeTabContent) {
+            activeTabContent.classList.remove('hidden');
+        }
 
         // Actualizar la clase activa en los botones de pestaña
-        const tabButtons = document.querySelectorAll('.flex > button');
-        tabButtons.forEach(button => {{
+        const tabButtons = document.querySelectorAll('.tab-bar > button'); // Adjusted selector for tab buttons
+        tabButtons.forEach(button => {
             button.classList.remove('text-blue-600', 'border-blue-600');
-            button.classList.add('text-gray-500', 'border-transparent');
-        }});
-        const activeButton = document.querySelector(`button[onclick="showTab('${{tabId}}')"]`);
-        if (activeButton) {{
+            // Ensure default classes are robust, e.g., text-gray-500 or similar
+            if (!button.classList.contains('hover:text-blue-600')) { // Avoid removing hover styles if they are separate
+                 button.classList.add('text-gray-500', 'border-transparent');
+            }
+        });
+
+        const activeButton = document.querySelector(`button[data-tabid='${tabId}']`); // Use data-tabid
+        if (activeButton) {
             activeButton.classList.remove('text-gray-500', 'border-transparent');
             activeButton.classList.add('text-blue-600', 'border-blue-600');
-        }}
+            localStorage.setItem('activePrimerEmpleadoTab', tabId);
+        }
 
-        // Limpiar mensajes de error al cambiar de pestaña
-        // clearErrors(); // Commenting out as Django handles errors now, unless client-side is also desired
-    }}
+        // Limpiar mensajes de error (if this function is still relevant and separate)
+        // clearErrors(); // Assuming clearErrors() is defined elsewhere if used.
+    }
 
-    // function clearErrors() {{ // If keeping client-side validation
-    //     const errors = document.querySelectorAll('span[id^="error-"]');
-    //     errors.forEach(error => error.textContent = '');
-    // }}
+    document.addEventListener('DOMContentLoaded', () => {
+        // Modify tab buttons to use data-tabid and call showTabAndPersist
+        const tabButtons = document.querySelectorAll('.tab-bar > button');
+        tabButtons.forEach(button => {
+            const originalOnclick = button.getAttribute('onclick'); // e.g., "showTab('crear-orden')"
+            if (originalOnclick && originalOnclick.includes("showTab(")) { // Check if it's an old showTab call
+                const tabIdMatch = originalOnclick.match(/showTab\('([^']+)'\)/);
+                if (tabIdMatch && tabIdMatch[1]) {
+                    const tabId = tabIdMatch[1];
+                    button.setAttribute('data-tabid', tabId); // Store tabId in a data attribute
+                    button.onclick = () => showTabAndPersist(tabId); // Replace onclick
+                }
+            } else if (originalOnclick && originalOnclick.includes("showTabAndPersist(")) {
+                 // If already converted (e.g. by a previous run of this script if HTML was saved and reloaded)
+                 // ensure data-tabid is set if not already.
+                const tabIdMatch = originalOnclick.match(/showTabAndPersist\('([^']+)'\)/);
+                 if (tabIdMatch && tabIdMatch[1] && !button.hasAttribute('data-tabid')) {
+                    button.setAttribute('data-tabid', tabIdMatch[1]);
+                 }
+            }
+        });
 
-    // function showError(elementId, message) {{ // If keeping client-side validation
-    //     const errorSpan = document.getElementById(`error-${{elementId}}`);
-    //     if (errorSpan) {{
-    //         errorSpan.textContent = message;
-    //     }}
-    // }}
+        const lastActiveTab = localStorage.getItem('activePrimerEmpleadoTab');
+        const urlParams = new URLSearchParams(window.location.search);
 
-    // The old JavaScript validation functions (validarCrearOrden, etc.) are removed or commented out
-    // as Django's server-side form validation is now primary. If you want to keep client-side
-    // validation for immediate feedback, you can uncomment and adapt them, but ensure they don't
-    // conflict with Django's error display.
+        const formSubmittedTab = urlParams.get('tab_after_submit');
+        const updateOrdenId = urlParams.get('update_orden_id');
+        const selectedOrdenIdRf5 = urlParams.get('selected_orden_id_rf5');
 
-    // Mostrar la pestaña por defecto al cargar la página
-    document.addEventListener('DOMContentLoaded', () => {{
-        // Check if there are form errors for the order form, if so, show that tab
+        let tabToActivate = null;
+
+        if (formSubmittedTab) {
+            tabToActivate = formSubmittedTab;
+        } else if (updateOrdenId) { // If an order is being updated, show the 'actualizar-orden' tab
+            tabToActivate = 'actualizar-orden';
+        } else if (selectedOrdenIdRf5 && document.getElementById('ver-estado')) { // If an order is selected for viewing, show 'ver-estado'
+            tabToActivate = 'ver-estado';
+        } else if (lastActiveTab) {
+            if (document.getElementById(lastActiveTab) && document.querySelector(`button[data-tabid='${lastActiveTab}']`)) {
+                 tabToActivate = lastActiveTab;
+            }
+        }
+
+        // Fallback logic: if errors in a form, prioritize that tab
         {% if order_form and order_form.errors %}
-            showTab('crear-orden');
-        {% else %}
-            // Default tab to show if no errors or other logic dictates otherwise
-            showTab('crear-orden');
+            tabToActivate = 'crear-orden';
+        {% elif consumption_form and consumption_form.errors %}
+            tabToActivate = 'registrar-consumo';
+        {% elif order_update_form and order_update_form.errors %}
+             // This condition might also need update_orden_id to be set to show the correct form instance
+            tabToActivate = 'actualizar-orden';
         {% endif %}
 
-        // Logic for other forms/tabs can be added here
-    }});
 
-    // Ejemplo de cómo se podría actualizar el estado de la orden (simulado) - this is old JS
-    document.getElementById('orden-estado').addEventListener('change', function() {{
-        const ordenId = this.value;
-        const estadoDetalle = document.getElementById('estado-detalle');
+        if (tabToActivate && document.getElementById(tabToActivate) && document.querySelector(`button[data-tabid='${tabToActivate}']`)) {
+            showTabAndPersist(tabToActivate);
+        } else {
+            // Default to the first tab if no specific tab is determined or valid
+            const firstTabButton = document.querySelector('.tab-bar > button[data-tabid]');
+            if (firstTabButton) {
+                showTabAndPersist(firstTabButton.getAttribute('data-tabid'));
+            }
+        }
+    });
 
-        // Datos simulados para el ejemplo
-        if (ordenId === 'orden001') {{
-            document.getElementById('estado-cliente').textContent = 'Cliente A';
-            document.getElementById('estado-tipo').textContent = 'Color';
-            document.getElementById('estado-cantidad').textContent = '100';
-            document.getElementById('estado-fecha').textContent = '2024-08-15';
-            document.getElementById('estado-actual').textContent = 'En Proceso';
-            document.getElementById('estado-impresora').textContent = 'Impresora Laser Color 1';
-        }} else if (ordenId === 'orden002') {{
-            document.getElementById('estado-cliente').textContent = 'Cliente B';
-            document.getElementById('estado-tipo').textContent = 'Blanco y Negro';
-            document.getElementById('estado-cantidad').textContent = '50';
-            document.getElementById('estado-fecha').textContent = '2024-08-16';
-            document.getElementById('estado-actual').textContent = 'Pendiente';
-            document.getElementById('estado-impresora').textContent = 'N/A';
-        }} else if (ordenId === 'orden003') {{
-            document.getElementById('estado-cliente').textContent = 'Cliente C';
-            document.getElementById('estado-tipo').textContent = 'Gran Formato';
-            document.getElementById('estado-cantidad').textContent = '2';
-            document.getElementById('estado-fecha').textContent = '2024-08-17';
-            document.getElementById('estado-actual').textContent = 'Completada';
-            document.getElementById('estado-impresora').textContent = 'Impresora Gran Formato 3';
-        }} else {{
-            document.getElementById('estado-cliente').textContent = 'N/A';
-            document.getElementById('estado-tipo').textContent = 'N/A';
-            document.getElementById('estado-cantidad').textContent = 'N/A';
-            document.getElementById('estado-fecha').textContent = 'N/A';
-            document.getElementById('estado-actual').textContent = 'N/A';
-            document.getElementById('estado-impresora').textContent = 'N/A';
-        }}
-
-        if (ordenId) {{
-            estadoDetalle.classList.remove('hidden');
-        }} else {{
-            estadoDetalle.classList.add('hidden');
-        }}
-    }});
+    // Old showTab function can be removed if no longer used elsewhere and fully replaced by showTabAndPersist
+    // function showTab(tabId) { ... }
+    // Old DOMContentLoaded that unconditionally showed 'crear-orden' is also replaced by the new logic.
 </script>
 
 </body>
