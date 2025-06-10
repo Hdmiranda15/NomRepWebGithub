@@ -8,7 +8,7 @@ from django.views.generic import RedirectView # Importar esta clase para la redi
 urlpatterns = [
     # Redirige la URL raíz (vacía) a la vista del dashboard del primer empleado
     # Esto resolverá el 404 en http://0.0.0.0:8000/
-    path('', RedirectView.as_view(url='/primerempleado/', permanent=False)),
+    path('', RedirectView.as_view(url='/primerempleado/', permanent=False)), # <--- Esta es la línea clave
 
     path('admin/', admin.site.urls),
     # Incluye las URLs de tu aplicación gestion_impresion.
