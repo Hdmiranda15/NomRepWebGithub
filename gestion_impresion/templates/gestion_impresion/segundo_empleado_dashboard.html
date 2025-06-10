@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Órdenes de Impresión (Lista Vertical)</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {{
+            font-family: 'Inter', sans-serif;
+        }}
+
+        /* Breakpoint para celulares de 300px */
+        @media (max-width: 300px) {{
+            .container {{
+                padding: 1rem;
+            }}
+            .grid {{
+                grid-template-columns: 1fr; /* Una sola columna en pantallas pequeñas */
+            }}
+        }}
+    </style>
+</head>
+<body class="bg-gray-100 font-normal text-gray-900">
+
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold mb-6 text-center">Gestión de Órdenes de Impresión</h1>
+
+        <div class="grid grid-cols-1 gap-6">
+
+            <!-- Recuadro para RF8: Ver Estado de Orden -->
+            <div class="bg-white shadow-lg rounded-lg p-6 flex items-start border border-blue-200">
+                <img src="https://unpkg.com/lucide-static@latest/icons/list-check.svg" alt="Ver Estado" class="w-8 h-8 text-blue-600 mr-4">
+                <div>
+                    <h2 class="text-xl font-semibold mb-1">Ver Estado de Orden</h2>
+                    <p class="text-gray-600">
+                        Consultar las órdenes de impresión asignadas y conocer su estado (pendiente, en ejecución, finalizada, etc.).
+                    </p>
+                </div>
+            </div>
+
+            <!-- Recuadro para RF9: Asignar Impresora a Orden -->
+            <div class="bg-white shadow-lg rounded-lg p-6 flex items-start border border-green-200">
+                <img src="https://unpkg.com/lucide-static@latest/icons/printer.svg" alt="Asignar Impresora" class="w-8 h-8 text-green-600 mr-4">
+                <div>
+                    <h2 class="text-xl font-semibold mb-1">Asignar Impresora a Orden</h2>
+                    <p class="text-gray-600">
+                        Asignar una impresora a una orden de impresión, según los criterios de disponibilidad, capacidad y características técnicas.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Recuadro para RF10: Consultar Disponibilidad de Impresoras -->
+            <div class="bg-white shadow-lg rounded-lg p-6 flex items-start border border-yellow-200">
+                <img src="https://unpkg.com/lucide-static@latest/icons/monitor-check.svg" alt="Disponibilidad" class="w-8 h-8 text-yellow-600 mr-4">
+                <div>
+                    <h2 class="text-xl font-semibold mb-1">Consultar Disponibilidad de Impresoras</h2>
+                    <p class="text-gray-600">
+                        Ver el listado de impresoras disponibles y su estado (libre, ocupada, en mantenimiento).
+                    </p>
+                </div>
+            </div>
+
+            <!-- Recuadro para RF11: Actualizar Estado de Impresora -->
+            <div class="bg-white shadow-lg rounded-lg p-6 flex items-start border border-red-200">
+                <img src="https://unpkg.com/lucide-static@latest/icons/settings-2.svg" alt="Actualizar Estado" class="w-8 h-8 text-red-600 mr-4">
+                <div>
+                    <h2 class="text-xl font-semibold mb-1">Actualizar Estado de Impresora</h2>
+                    <p class="text-gray-600">
+                        Actualizar el estado operativo de una impresora (por ejemplo: activa, fuera de servicio, mantenimiento).
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'gestion_impresion',
 ]
 
 MIDDLEWARE = [
@@ -75,11 +76,11 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'your_db_name',
-        'USER': 'your_db_user',
-        'PASSWORD': 'your_db_password',
-        'HOST': 'localhost',
-        'PORT': '',
+        'NAME': 'db_bcnf_4fn',        # Your database name
+        'USER': 'YOUR_DB_USER',      # Replace with your DB username
+        'PASSWORD': 'YOUR_DB_PASSWORD',# Replace with your DB password
+        'HOST': 'localhost',         # Or your DB host (e.g., '127.0.0.1')
+        'PORT': '5432',              # Default PostgreSQL port
     }
 }
 
@@ -124,3 +125,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Media files (User-uploaded files)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

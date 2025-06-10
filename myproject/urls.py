@@ -15,8 +15,16 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include # Ensure include is imported
+from django.conf import settings # Import settings
+from django.conf.urls.static import static # Import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # Remove the old 'gestion/' prefix if it exists, and include directly
+    path('', include('gestion_impresion.urls')),
 ]
+
+# Serve media files during development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
