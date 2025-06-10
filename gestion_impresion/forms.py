@@ -28,15 +28,17 @@ class OrderCreationForm(forms.Form):
         min_value=1,
         widget=forms.NumberInput(attrs={'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500'})
     )
-        # New field for number of pages:
-        numero_paginas_documento = forms.IntegerField(
-            label='Número de Páginas del Documento',
-            min_value=1,
-            widget=forms.NumberInput(attrs={'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500'}),
-            help_text="Ingrese el número total de páginas contenidas en el archivo que subió."
-        )
+    # New field for number of pages:
+    # ***** CORRECCIÓN DE INDENTACIÓN AQUÍ Y LAS SIGUIENTES LÍNEAS *****
+    # Estas líneas deberían estar al mismo nivel de indentación que `nombre_cliente` y `tipo_impresion`
+    numero_paginas_documento = forms.IntegerField(
+        label='Número de Páginas del Documento',
+        min_value=1,
+        widget=forms.NumberInput(attrs={'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500'}),
+        help_text="Ingrese el número total de páginas contenidas en el archivo que subió."
+    )
 
-        fecha_entrega_solicitada = forms.DateField( # Ensure this is below the new field or placed logically
+    fecha_entrega_solicitada = forms.DateField( # Ensure this is below the new field or placed logically
         label='Fecha de Entrega',
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500'})
     )
